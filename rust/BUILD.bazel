@@ -8,7 +8,10 @@ exports_files(["defs.bzl"])
 bzl_library(
     name = "defs_bzl",
     srcs = ["defs.bzl"],
-    deps = ["//jsonschema:toolchains_bzl"],
+    deps = [
+        "//jsonschema:toolchains_bzl",
+        "@rules_rust//rust:bzl_lib",
+    ],
 )
 
 # Default Rust codegen toolchain: typify-backed, ships with

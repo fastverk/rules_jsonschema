@@ -1,0 +1,136 @@
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("//util:write_source_files.bzl", "write_source_files")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
+
+package(default_visibility = ["//visibility:public"])
+
+# Reference docs are stardoc-generated *and* committed to source. The
+# diff_test gates assert the committed file matches what stardoc
+# produces from the .bzl docstrings; CI fails if someone changes a
+# rule without running `bazel run //docs:update`.
+#
+# Each documented public .bzl gets one stardoc + one diff_test, all
+# wired through the `update` write_source_files target.
+#
+# Skips (documented narratively in README only): none currently — the
+# external loads (rules_rust, rules_go) are wrapped via the published
+# bzl_lib targets in those repos.
+
+stardoc(
+    name = "providers_doc",
+    out = "providers.md.generated",
+    input = "//jsonschema:providers.bzl",
+    deps = ["//jsonschema:providers_bzl"],
+)
+
+stardoc(
+    name = "toolchains_doc",
+    out = "toolchains.md.generated",
+    input = "//jsonschema:toolchains.bzl",
+    deps = ["//jsonschema:toolchains_bzl"],
+)
+
+stardoc(
+    name = "contract_test_doc",
+    out = "contract_test.md.generated",
+    input = "//jsonschema:contract_test.bzl",
+    deps = ["//jsonschema:contract_test_bzl"],
+)
+
+stardoc(
+    name = "helpers_doc",
+    out = "helpers.md.generated",
+    input = "//runtime:helpers.bzl",
+    deps = ["//runtime:helpers"],
+)
+
+stardoc(
+    name = "rust_defs_doc",
+    out = "rust_defs.md.generated",
+    input = "//rust:defs.bzl",
+    deps = ["//rust:defs_bzl"],
+)
+
+stardoc(
+    name = "starlark_defs_doc",
+    out = "starlark_defs.md.generated",
+    input = "//starlark:defs.bzl",
+    deps = ["//starlark:defs_bzl"],
+)
+
+stardoc(
+    name = "go_defs_doc",
+    out = "go_defs.md.generated",
+    input = "//go:defs.bzl",
+    deps = ["//go:defs_bzl"],
+)
+
+stardoc(
+    name = "write_source_files_doc",
+    out = "write_source_files.md.generated",
+    input = "//util:write_source_files.bzl",
+    deps = ["//util:write_source_files_bzl"],
+)
+
+diff_test(
+    name = "providers_doc_up_to_date",
+    file1 = "providers.md",
+    file2 = ":providers_doc",
+)
+
+diff_test(
+    name = "toolchains_doc_up_to_date",
+    file1 = "toolchains.md",
+    file2 = ":toolchains_doc",
+)
+
+diff_test(
+    name = "contract_test_doc_up_to_date",
+    file1 = "contract_test.md",
+    file2 = ":contract_test_doc",
+)
+
+diff_test(
+    name = "helpers_doc_up_to_date",
+    file1 = "helpers.md",
+    file2 = ":helpers_doc",
+)
+
+diff_test(
+    name = "rust_defs_doc_up_to_date",
+    file1 = "rust_defs.md",
+    file2 = ":rust_defs_doc",
+)
+
+diff_test(
+    name = "starlark_defs_doc_up_to_date",
+    file1 = "starlark_defs.md",
+    file2 = ":starlark_defs_doc",
+)
+
+diff_test(
+    name = "go_defs_doc_up_to_date",
+    file1 = "go_defs.md",
+    file2 = ":go_defs_doc",
+)
+
+diff_test(
+    name = "write_source_files_doc_up_to_date",
+    file1 = "write_source_files.md",
+    file2 = ":write_source_files_doc",
+)
+
+# `bazel run //docs:update` writes all stardoc outputs back to source.
+write_source_files(
+    name = "update",
+    files = {
+        "providers.md": ":providers_doc",
+        "toolchains.md": ":toolchains_doc",
+        "contract_test.md": ":contract_test_doc",
+        "helpers.md": ":helpers_doc",
+        "rust_defs.md": ":rust_defs_doc",
+        "starlark_defs.md": ":starlark_defs_doc",
+        "go_defs.md": ":go_defs_doc",
+        "write_source_files.md": ":write_source_files_doc",
+    },
+)

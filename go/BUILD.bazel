@@ -8,7 +8,10 @@ exports_files(["defs.bzl"])
 bzl_library(
     name = "defs_bzl",
     srcs = ["defs.bzl"],
-    deps = ["//jsonschema:toolchains_bzl"],
+    deps = [
+        "//jsonschema:toolchains_bzl",
+        "@rules_go//go:def",
+    ],
 )
 
 # Default Go codegen toolchain.
