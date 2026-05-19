@@ -1,0 +1,62 @@
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@rules_go//go:def.bzl", "go_test")
+load("@rules_jsonschema//go:defs.bzl", "jsonschema_go_library")
+load("@rules_jsonschema//rust:defs.bzl", "jsonschema_rust_library")
+load("@rules_jsonschema//starlark:defs.bzl", "jsonschema_starlark_codegen")
+load("@rules_rust//rust:defs.bzl", "rust_test")
+
+# Generate a `person` rust_library from the JSON Schema. Consumers
+# `deps = [":person_types"]` and get typed Person / Address structs.
+jsonschema_rust_library(
+    name = "person_types",
+    schema = "person.json",
+)
+
+# Round-trip test: a deny_unknown_fields decode + re-serialize through
+# the generated types proves the typegen pipeline produces working
+# code. The test owns its own input fixture inline so it has nothing
+# to do with the schema beyond the type definitions.
+rust_test(
+    name = "person_types_test",
+    srcs = ["roundtrip_test.rs"],
+    edition = "2021",
+    deps = [
+        ":person_types",
+        "@crates//:serde_json",
+    ],
+)
+
+# Regenerate the typed Starlark rules for `person` and `address` from
+# the same schema. The output is committed (person_rules.bzl), the
+# diff_test below catches drift.
+jsonschema_starlark_codegen(
+    name = "person_rules_gen",
+    schema = "person.json",
+    kinds = [
+        ("person", "#", "smoke_person", "PersonInfo"),
+        ("address", "#/$defs/address", "smoke_address", "AddressInfo"),
+    ],
+)
+
+diff_test(
+    name = "person_rules_up_to_date",
+    file1 = "person_rules.bzl",
+    file2 = ":person_rules_gen",
+)
+
+# Second-language proof for the plugin contract: same schema → typed
+# Go bindings via a plugin written in Go (uses go/format for output).
+# Round-trip test asserts the generated types decode the same JSON the
+# Rust version does.
+jsonschema_go_library(
+    name = "person_go_types",
+    schema = "person.json",
+    importpath = "github.com/fastverk/rules_jsonschema/examples/smoke/person_go_types",
+    package = "person_go_types",
+)
+
+go_test(
+    name = "person_go_types_test",
+    srcs = ["roundtrip_go_test.go"],
+    embed = [":person_go_types"],
+)

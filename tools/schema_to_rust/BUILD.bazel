@@ -1,0 +1,24 @@
+load("@crates//:defs.bzl", "aliases", "all_crate_deps")
+load("@rules_jsonschema//jsonschema:contract_test.bzl", "jsonschema_plugin_contract_test")
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["Cargo.toml"])
+
+rust_binary(
+    name = "schema_to_rust",
+    srcs = ["src/main.rs"],
+    aliases = aliases(),
+    edition = "2021",
+    deps = all_crate_deps(),
+)
+
+# The plugin must conform to the rules_jsonschema plugin contract.
+# This gates that — stdout-only-on-success, exit-code-only-as-success-
+# signal, unknown-flag rejection, determinism. Same gate is applied
+# to every default plugin we ship.
+jsonschema_plugin_contract_test(
+    name = "schema_to_rust_conforms",
+    plugin = ":schema_to_rust",
+)

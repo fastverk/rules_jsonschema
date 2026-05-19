@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "person.json",
+  "title": "Person",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Full legal name."
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Age in completed years."
+    },
+    "favourite_colour": {
+      "type": "string",
+      "enum": ["red", "green", "blue"],
+      "description": "Closed set of accepted values."
+    },
+    "addresses": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/address"},
+      "description": "Zero or more mailing addresses."
+    }
+  },
+  "$defs": {
+    "address": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["line1", "country"],
+      "properties": {
+        "line1": {"type": "string"},
+        "line2": {"type": "string"},
+        "country": {
+          "type": "string",
+          "description": "ISO-3166 alpha-2 country code."
+        }
+      }
+    }
+  }
+}

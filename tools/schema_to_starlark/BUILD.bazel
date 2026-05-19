@@ -1,0 +1,31 @@
+load("@crates//:defs.bzl", "aliases", "all_crate_deps")
+load("@rules_jsonschema//jsonschema:contract_test.bzl", "jsonschema_plugin_contract_test")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_test")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["Cargo.toml"])
+
+rust_binary(
+    name = "schema_to_starlark",
+    srcs = [
+        "src/classifier.rs",
+        "src/emit.rs",
+        "src/main.rs",
+    ],
+    aliases = aliases(),
+    crate_root = "src/main.rs",
+    edition = "2021",
+    deps = all_crate_deps(),
+)
+
+# Unit tests for the property → attr classifier helpers.
+rust_test(
+    name = "schema_to_starlark_test",
+    crate = ":schema_to_starlark",
+)
+
+jsonschema_plugin_contract_test(
+    name = "schema_to_starlark_conforms",
+    plugin = ":schema_to_starlark",
+)

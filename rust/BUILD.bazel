@@ -1,0 +1,28 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("//jsonschema:toolchains.bzl", "jsonschema_codegen_toolchain")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["defs.bzl"])
+
+bzl_library(
+    name = "defs_bzl",
+    srcs = ["defs.bzl"],
+    deps = ["//jsonschema:toolchains_bzl"],
+)
+
+# Default Rust codegen toolchain: typify-backed, ships with
+# rules_jsonschema. Registered by the root MODULE.bazel so consumers
+# don't need extra setup. Override by registering your own toolchain
+# of `@rules_jsonschema//jsonschema:rust_codegen_toolchain_type`
+# ahead of this one.
+jsonschema_codegen_toolchain(
+    name = "default_rust_codegen",
+    binary = "//tools/schema_to_rust:schema_to_rust",
+)
+
+toolchain(
+    name = "default_rust_codegen_toolchain",
+    toolchain = ":default_rust_codegen",
+    toolchain_type = "//jsonschema:rust_codegen_toolchain_type",
+)

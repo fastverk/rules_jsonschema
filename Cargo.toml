@@ -1,0 +1,28 @@
+[workspace]
+resolver = "2"
+members = [
+    "tools/contract_test",
+    "tools/schema_to_rust",
+    "tools/schema_to_starlark",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+# Shared dependency pins. Workspace members reference these via
+# `<name>.workspace = true` in their per-crate Cargo.toml — keeps
+# versions in lockstep across the two tools (one Rust toolchain, one
+# serde pin, etc.).
+[workspace.dependencies]
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# Only used by schema_to_rust + generated typegen consumers, but lives
+# here so the version bumps in one place.
+schemars = "0.8"
+typify = "0.4"
+prettyplease = "0.2"
+syn = { version = "2", features = ["parsing", "full"] }
+regress = "0.10"
