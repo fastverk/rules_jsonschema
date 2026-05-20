@@ -4,6 +4,26 @@ All notable changes to rules_jsonschema. The format is loosely
 [Keep a Changelog](https://keepachangelog.com/) — version headers
 mirror the published bazel-registry entries.
 
+## 0.3.0 — auto-kinds for schema_to_starlark
+
+- `schema_to_starlark`: synthesize `--kind` entries from a schema
+  location instead of hand-enumerating them. Six new flags:
+  `--kinds-pointer-base=POINTER` (required to enable),
+  `--kinds-pointer-suffix=SUFFIX`, `--kinds-key-filter=REGEX`,
+  `--id-template=TPL`, `--rule-name-template=TPL`,
+  `--provider-name-template=TPL`. Templates expand `{key}`,
+  `{snake}`, `{camel}`. Motivated by large schemas (AWS
+  CloudFormation: ~1200 resource types) where hand-enumerating
+  every kind is impractical.
+- `jsonschema_starlark_codegen` macro: `kinds` is now optional;
+  callers that drive entirely through auto-kinds via `extra_args`
+  may omit it.
+- `jsonschema/plugin_contract.md`: documents the new
+  `jsonschema_starlark_codegen`-forwarded flags.
+
+Backwards-compatible — explicit `--kind=` continues to work
+unchanged; auto-kinds are opt-in.
+
 ## 0.2.0 — docs + CI infrastructure
 
 - Stardoc-generated reference docs for all 8 public-API .bzl

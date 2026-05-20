@@ -48,7 +48,7 @@ plugin. Each rule defines its own set; example:
 |---|---|
 | `jsonschema_rust_library` | (none today; rule wraps output in `rust_library`) |
 | `jsonschema_go_library` | `--package=NAME` |
-| `jsonschema_starlark_codegen` | `--kind=ID=POINTER:RULE_NAME:PROVIDER_NAME` (repeated) |
+| `jsonschema_starlark_codegen` | `--kind=ID=POINTER:RULE_NAME:PROVIDER_NAME` (repeated); auto-kinds: `--kinds-pointer-base=POINTER`, `--kinds-pointer-suffix=SUFFIX`, `--kinds-key-filter=REGEX`, `--id-template=TPL`, `--rule-name-template=TPL`, `--provider-name-template=TPL` |
 
 Plugins should treat unknown flags as a hard error — silently ignoring
 them would make misconfigured options degrade the output without

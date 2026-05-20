@@ -26,3 +26,6 @@ typify = "0.4"
 prettyplease = "0.2"
 syn = { version = "2", features = ["parsing", "full"] }
 regress = "0.10"
+# schema_to_starlark uses regex for the --kinds-key-filter option
+# (v0.3+ auto-kinds support — see the plugin contract).
+regex = "1"

@@ -66,7 +66,7 @@ _jsonschema_starlark_codegen_rule = rule(
     toolchains = [_TOOLCHAIN],
 )
 
-def jsonschema_starlark_codegen(name, schema, kinds, extra_args = None, **kwargs):
+def jsonschema_starlark_codegen(name, schema, kinds = None, extra_args = None, **kwargs):
     """Generate a `.bzl` of typed rules from a JSON Schema.
 
     Args:
@@ -81,13 +81,18 @@ def jsonschema_starlark_codegen(name, schema, kinds, extra_args = None, **kwargs
           binds to.
         - `provider_name`: the public Starlark symbol the rule's
           companion provider binds to.
+        Optional — if omitted, `extra_args` typically enables the
+        plugin's auto-kinds derivation (e.g.
+        `--kinds-pointer-base=...` for the default
+        `schema_to_starlark` toolchain). Leaving both empty produces
+        a preamble-only `.bzl` (legal but rarely useful).
       extra_args: extra `--key=value` flags appended to the plugin's
         argv. Use to set plugin-specific options without registering
         a new toolchain.
       **kwargs: forwarded to the underlying rule (visibility, etc.).
     """
     encoded = []
-    for spec in kinds:
+    for spec in kinds or []:
         if type(spec) != "tuple" or len(spec) != 4:
             fail("kinds entries must be 4-tuples (id, pointer, rule_name, provider_name); got: {}".format(spec))
         encoded.append("{}={}:{}:{}".format(spec[0], spec[1], spec[2], spec[3]))
